@@ -11,17 +11,15 @@ add_compile_options(
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED true)
 
+add_executable(matrix main.cpp)
+
 find_package(GTest REQUIRED)
 
-add_subdirectory(matrix)
+enable_testing()
+add_definitions(-DCMAKE_CURRENT_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
 
-if(TEST)
-    add_executable(test test/unit_test.cpp)
-    target_link_libraries(test PRIVATE matrixlib)
+add_executable(testex tests/unit_test.cpp)
+target_include_directories(testex PRIVATE ${GTEST_INCLUDE_DIRS})
+target_link_libraries(testex GTest::GTest GTest::Main)
 
-    target_include_directories(test PRIVATE ${GTEST_INCLUDE_DIRS})
-    target_link_libraries(test GTest::GTest GTest::Main)
-else()
-    add_executable(matrix_ main.cpp)
-    target_link_libraries(matrix_ PRIVATE matrixlib)
-endif()
+add_test(NAME mytest COMMAND testex)

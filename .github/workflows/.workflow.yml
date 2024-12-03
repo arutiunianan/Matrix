@@ -1,0 +1,25 @@
+name: Triangles intersection pre-commit and post-push
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+    - name: Install google test and boost, also install g++-12 (for atomic shared pointers)
+      run: sudo apt-get install libgtest-dev googletest googletest-tools google-mock libboost-dev g++-12
+    - name: Checkout repository
+      uses: actions/checkout@v3
+    - name: CMake release config
+      run: cmake -S . -B build -DCMAKE_CXX_COMPILER=g++-12 -DCMAKE_BUILD_TYPE=Release
+    - name: CMake release build
+      run: cmake --build build
+    - name: Run tests
+      run: ctest --output-on-failure --test-dir build
