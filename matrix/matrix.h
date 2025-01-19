@@ -31,8 +31,14 @@ public:
         return cols_;
     }
 
-    T   &operator[](size_t index)                const;
-    bool operator==(Matrix_t<T> compared_matrix) const;
+    T           &operator[](size_t index)                const;
+    bool        operator==(Matrix_t<T> compared_matrix)  const;
+    Matrix_t<T> operator*(Matrix_t& matrix)              const;
+    Matrix_t<T> operator+(Matrix_t& matrix)              const;
+    Matrix_t<T> operator-(Matrix_t& matrix)              const;
+
+    Matrix_t<T> inverse() const;
+    T *getIdentityMatrix();
 
     T blockGaussMethod(size_t block_size);
     T *getUppertriangularForm();
@@ -52,7 +58,11 @@ template<typename T>
 Matrix_t<T>::Matrix_t(size_t rows, size_t cols):
     rows_(rows), cols_(cols){
     matrix_ = new T[rows * cols];
-    //std::cin >> matrix_;
+    for(size_t i = 0; i < cols_; ++i) {
+        for(size_t j = 0; j < rows_; ++j) {
+            matrix_[rows_ * i + j] = 0;
+        }
+    }
 }
 
 template<typename T>
@@ -62,6 +72,16 @@ Matrix_t<T>::Matrix_t(size_t rows):
 template<typename T>
 Matrix_t<T>::~Matrix_t() {
     delete[] matrix_;
+}
+
+template<typename T>
+T *Matrix_t<T>::getIdentityMatrix() {
+    for(size_t i = 0; i < cols_; ++i) {
+        for(size_t j = 0; j < rows_; ++j) {
+            matrix_[i * rows_ + j] = (i == j) ? 1 : 0;
+        }
+    }
+    return matrix_;
 }
 
 //-------------------Implementation of the Gauss block method-------------------
@@ -123,6 +143,72 @@ bool Matrix_t<T>::operator==(Matrix_t<T> compared_matrix) const {
     return true;
 }
 
+template<typename T>
+Matrix_t<T> Matrix_t<T>::operator*(Matrix_t& matrix) const {
+    Matrix_t mulMatrix(rows_, matrix.getCols());
+    for(size_t i = 0; i < rows_; ++i) {
+        for(size_t j = 0; j < matrix.getCols(); ++j) {
+            for(size_t k = 0; k < cols_; ++k) {
+                mulMatrix[rows_ * i + j] += matrix_[rows_ * i + k] * matrix[rows_ * k + j];
+            }
+        }
+    }
+    return mulMatrix;
+}
+
+template<typename T>
+Matrix_t<T> Matrix_t<T>::operator+(Matrix_t& matrix) const {
+    Matrix_t addMatrix(rows_, matrix.getCols());
+    for(size_t i = 0; i < rows_; ++i) {
+        for(size_t j = 0; j < matrix.getCols(); ++j) {
+            addMatrix[rows_ * i + j] = matrix_[rows_ * i + j] + matrix[rows_ * i + j];
+        }
+    }
+    return addMatrix;
+}
+
+template<typename T>
+Matrix_t<T> Matrix_t<T>::operator-(Matrix_t& matrix) const {
+    Matrix_t subMatrix(rows_, matrix.getCols());
+    for(size_t i = 0; i < rows_; ++i) {
+        for(size_t j = 0; j < matrix.getCols(); ++j) {
+            subMatrix[rows_ * i + j] = matrix_[rows_ * i + j] - matrix[rows_ * i + j];
+        }
+    }
+    return subMatrix;
+}
+
+template<typename T>
+Matrix_t<T> Matrix_t<T>::inverse() const {
+    Matrix_t inverseMatrix(rows_, cols_);
+    T *indentityMatrix = inverseMatrix.getIdentityMatrix();
+
+    T *bufmatrix_ = new T[rows_ * cols_];
+    std::memcpy(bufmatrix_, matrix_, sizeof(T) * rows_ * cols_);
+    for(size_t i = 0; i < cols_; ++i) {
+        T i_elem = bufmatrix_[rows_ * i + i];
+        for(size_t j = 0; j < rows_; ++j) {
+            bufmatrix_[rows_ * i + j] = bufmatrix_[rows_ * i + j] / i_elem;
+            indentityMatrix[rows_ * i + j] = indentityMatrix[rows_ * i + j] / i_elem;
+        }
+
+        for(size_t j = 0; j < cols_; ++j) {
+            if(j == i) {
+                continue;
+            }
+
+            T i_elem = bufmatrix_[j * rows_ + i];
+            for(size_t k = 0; k < rows_; ++k) {
+                bufmatrix_[j * rows_ + k] = bufmatrix_[j * rows_ + k] - i_elem * bufmatrix_[rows_ * i + k];
+                indentityMatrix[j * rows_ + k] = indentityMatrix[j * rows_ + k] - i_elem * indentityMatrix[rows_ * i + k];
+            }
+        }
+    }
+
+    delete []bufmatrix_;
+    return inverseMatrix;
+}
+
 //-----------------------------Matrix input output-----------------------------
 
 template<typename T>
@@ -148,7 +234,7 @@ std::ostream &operator<<(std::ostream &ostr, const Matrix_t<T> &matrix)
         }
         ostr << std::endl;
 	}
-	return ostr;      
+	return ostr;
 }
 
 #endif // #define MATRIX_H_
