@@ -1,4 +1,4 @@
-#include "uptriang_test.cpp"
+#include "base_operators.h"
 
 int main(int argc, char **argv)
 {

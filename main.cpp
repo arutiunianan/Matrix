@@ -3,8 +3,6 @@
 int main() {
     size_t N;
     std::cin >> N;
-    Matrix_t<int> matrix(N);
+    Matrix_t<double> matrix(N);
     std::cin >> matrix;
-    matrix.getUppertriangularForm();
-    std::cout << matrix;
 }
