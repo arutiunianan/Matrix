@@ -22,7 +22,7 @@ private:
 public:
     Matrix_t(size_t rows, size_t cols);
     Matrix_t(size_t rows);
-    //~Matrix_t();
+    ~Matrix_t();
 
     size_t getRows() const {
         return rows_;
@@ -62,9 +62,9 @@ template<typename T>
 Matrix_t<T>::Matrix_t(size_t rows, size_t cols):
     rows_(rows), cols_(cols){
     matrix_ = new T[rows * cols];
-    for(size_t i = 0; i < cols_; ++i) {
-        for(size_t j = 0; j < rows_; ++j) {
-            matrix_[cols_ * i + j] = 0;
+    for(size_t i = 0; i < rows; ++i) {
+        for(size_t j = 0; j < cols; ++j) {
+            matrix_[cols * i + j] = 0;
         }
     }
 }
@@ -73,10 +73,10 @@ template<typename T>
 Matrix_t<T>::Matrix_t(size_t rows):
     Matrix_t(rows, rows) {}
 
-/*template<typename T>
+template<typename T>
 Matrix_t<T>::~Matrix_t() {
     delete[] matrix_;
-}*/
+}
 
 template<typename T>
 T *Matrix_t<T>::getIdentityMatrix() {
@@ -251,10 +251,11 @@ Matrix_t<T> Matrix_t<T>::transpose() const {
 template<typename T>
 std::istream &operator>>(std::istream &istr, Matrix_t<T> &matrix)
 {
-	for(size_t i = 0; i < matrix.cols_; ++i) {
-		for(size_t j = 0; j < matrix.rows_; ++j)  {
+	for(size_t i = 0; i < matrix.rows_; ++i) {
+		for(size_t j = 0; j < matrix.cols_; ++j)  {
     		istr >> std::ws;
-			istr >> matrix[i * matrix.rows_ + j];
+			istr >> matrix[matrix.cols_ * i + j];
+            std::cout << std::endl << std::endl << matrix.cols_ * i + j << std::endl << std::endl;
     	}
 	}
 	return istr;
@@ -265,9 +266,9 @@ std::ostream &operator<<(std::ostream &ostr, const Matrix_t<T> &matrix)
 {
     ostr << std::endl;
     ostr << matrix.rows_ << " " << matrix.cols_ << std::endl;
-	for(size_t i = 0; i < matrix.cols_; ++i) {
-		for(size_t j = 0; j < matrix.rows_; ++j)  {
-            ostr << matrix[i * matrix.rows_ + j] << " ";
+	for(size_t i = 0; i < matrix.rows_; ++i) {
+		for(size_t j = 0; j < matrix.cols_; ++j)  {
+            ostr << matrix[matrix.cols_ * i + j] << " ";
         }
         ostr << std::endl;
 	}
