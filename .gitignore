@@ -1,4 +1,6 @@
 build/
+docker/docker.txt
+docker/dockererr.txt
 .vscode/
 .DS_Store
 for_readme/.DS_Store

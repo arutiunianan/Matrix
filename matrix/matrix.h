@@ -3,6 +3,9 @@
 
 #include <iostream>
 #include <cstring>
+#include <cmath>
+
+const double epsilon = 1e-9;
 
 template<typename T>
 class Matrix_t;
@@ -17,7 +20,17 @@ class Matrix_t {
 private:
     size_t rows_;
     size_t cols_;
-    T *matrix_;
+    T **matrix_;
+
+    class Row {
+    public:
+        Row(T* row) : row_(row) {}
+        T& operator[](size_t j) {
+            return row_[j];
+        }
+    private:
+        T* row_;
+    };
 
 public:
     Matrix_t(size_t rows, size_t cols);
@@ -31,21 +44,20 @@ public:
         return cols_;
     }
 
-    T           &operator[](size_t index)                const;
-    bool        operator==(Matrix_t<T> &compared_matrix) const;
-    Matrix_t<T> operator*(Matrix_t &matrix)              const;
-    Matrix_t<T> operator*(T value)                       const;
-    Matrix_t<T> operator/(T value)                       const;
-    Matrix_t<T> operator+(Matrix_t &matrix)              const;
-    Matrix_t<T> operator-(Matrix_t &matrix)              const;
+    Row         operator[](size_t index)       const;
+    bool        operator==(Matrix_t<T> &matrix) const;
+    Matrix_t<T> operator*(Matrix_t &matrix)     const;
+    Matrix_t<T> operator*(T value)              const;
+    Matrix_t<T> operator/(T value)              const;
+    Matrix_t<T> operator+(Matrix_t &matrix)     const;
+    Matrix_t<T> operator-(Matrix_t &matrix)     const;
 
     Matrix_t<T> inverse() const;
     Matrix_t<T> transpose() const;
 
-    T *getIdentityMatrix();
+    T **getIdentityMatrix();
 
-    //T blockGaussMethod(size_t block_size);
-    //T *getUppertriangularForm();
+    T BareissAlgorithm();
 
 private:
     size_t getSize() const {
@@ -61,10 +73,11 @@ private:
 template<typename T>
 Matrix_t<T>::Matrix_t(size_t rows, size_t cols):
     rows_(rows), cols_(cols){
-    matrix_ = new T[rows * cols];
+    matrix_ = new T *[rows];
     for(size_t i = 0; i < rows; ++i) {
+        matrix_[i] = new T[cols];
         for(size_t j = 0; j < cols; ++j) {
-            matrix_[cols * i + j] = 0;
+            matrix_[i][j] = 0;
         }
     }
 }
@@ -75,73 +88,50 @@ Matrix_t<T>::Matrix_t(size_t rows):
 
 template<typename T>
 Matrix_t<T>::~Matrix_t() {
+    for (size_t i = 0; i < rows_; ++i) {
+        delete[] matrix_[i];
+    }
     delete[] matrix_;
 }
 
 template<typename T>
-T *Matrix_t<T>::getIdentityMatrix() {
+T **Matrix_t<T>::getIdentityMatrix() {
     for(size_t i = 0; i < rows_; ++i) {
         for(size_t j = 0; j < cols_; ++j) {
-            matrix_[cols_ * i + j] = (i == j) ? 1 : 0;
+            matrix_[i][j] = (i == j) ? 1 : 0;
         }
     }
     return matrix_;
 }
-
-//-------------------Implementation of the Gauss block method-------------------
-
-/*template<typename T>
-T Matrix_t<T>::blockGaussMethod(size_t block_size) {
-    if(rows_ != cols_) {
-        std::cout << "The determinant is considered only for square matrices";
-        return 0;
-    }
-    size_t blocks_count = rows_ / block_size;
-    size_t elems_outside_blocks = rows_ % block_size;
-    for (size_t block_ind = 1; block_ind <= blocks_count; ++block_ind) {
-
-    }
-}
+/*
+//--------------------Implementation of the Bareiss algorithm-------------------
 
 template<typename T>
-T *Matrix_t<T>::getUppertriangularForm() {
-    T *cur_row = new T[rows_];
-    for(size_t i = 0; i < cols_ - 1; ++i) {
-        std::memcpy(cur_row, matrix_ + rows_ * i, sizeof(T) * rows_);
-
-        T i_elem = cur_row[i];
-        for(size_t j = 0; j < rows_; ++j) {
-            cur_row[j] = cur_row[j] / i_elem;
-        }
-
-        for(size_t j = i + 1; j < cols_; ++j) {
-            T i_elem = matrix_[j * rows_ + i];
-            for(size_t k = 0; k < rows_; ++k) {
-                matrix_[j * rows_ + k] = matrix_[j * rows_ + k] - i_elem * cur_row[k];
-            }
-        }
-    }
-}*/
+T Matrix_t<T>::BareissAlgorithm() {
+    
+}
 
 //-------------------------------Matrix operators-------------------------------
-
+*/
 template<typename T>
-T &Matrix_t<T>::operator[](size_t index) const {
-    return matrix_[index];
+Matrix_t<T>::Row Matrix_t<T>::operator[](size_t index) const {
+    return Row(matrix_[index]);
 }
 
 template<typename T>
-bool Matrix_t<T>::operator==(Matrix_t<T> &compared_matrix) const {
-    if(rows_ != compared_matrix.getRows()) {
+bool Matrix_t<T>::operator==(Matrix_t<T> &matrix) const {
+    if(rows_ != matrix.getRows()) {
         return false;
     }
-    if(cols_ != compared_matrix.getCols()) {
+    if(cols_ != matrix.getCols()) {
         return false;
     }
 
-    for(size_t i = 0; i < getSize(); ++i) {
-        if(matrix_[i] != compared_matrix[i]) {
-            return false;
+    for(size_t i = 0; i < rows_; ++i) {
+        for(size_t j = 0; j < cols_; ++j) {
+            if(std::fabs(matrix_[i][j] - matrix[i][j]) > epsilon) {
+                return false;
+            }
         }
     }
     return true;
@@ -153,7 +143,7 @@ Matrix_t<T> Matrix_t<T>::operator*(Matrix_t &matrix) const {
     for(size_t i = 0; i < rows_; ++i) {
         for(size_t j = 0; j < matrix.getCols(); ++j) {
             for(size_t k = 0; k < cols_; ++k) {
-                mulMatrix[matrix.getCols() * i + j] += matrix_[cols_ * i + k] * matrix[matrix.getCols() * k + j];
+                mulMatrix[i][j] += matrix_[i][k] * matrix[k][j];
             }
         }
     }
@@ -165,7 +155,7 @@ Matrix_t<T> Matrix_t<T>::operator*(T value) const {
     Matrix_t mulMatrix(rows_, cols_);
     for(size_t i = 0; i < rows_; ++i) {
         for(size_t j = 0; j < cols_; ++j) {
-            mulMatrix[cols_ * i + j] = matrix_[cols_ * i + j] * value;
+            mulMatrix[i][j] = matrix_[i][j] * value;
         }
     }
     return mulMatrix;
@@ -176,7 +166,7 @@ Matrix_t<T> Matrix_t<T>::operator/(T value) const {
     Matrix_t divMatrix(rows_, cols_);
     for(size_t i = 0; i < rows_; ++i) {
         for(size_t j = 0; j < cols_; ++j) {
-            divMatrix[cols_ * i + j] = matrix_[cols_ * i + j] / value;
+            divMatrix[i][j] = matrix_[i][j] / value;
         }
     }
     return divMatrix;
@@ -184,10 +174,10 @@ Matrix_t<T> Matrix_t<T>::operator/(T value) const {
 
 template<typename T>
 Matrix_t<T> Matrix_t<T>::operator+(Matrix_t &matrix) const {
-    Matrix_t addMatrix(rows_, matrix.getCols());
-    for(size_t i = 0; i < matrix.getCols(); ++i) {
-        for(size_t j = 0; j < rows_; ++j) {
-            addMatrix[cols_ * i + j] = matrix_[cols_ * i + j] + matrix[cols_ * i + j];
+    Matrix_t addMatrix(rows_, cols_);
+    for(size_t i = 0; i < rows_; ++i) {
+        for(size_t j = 0; j < cols_; ++j) {
+            addMatrix[i][j] = matrix_[i][j] + matrix[i][j];
         }
     }
     return addMatrix;
@@ -195,10 +185,10 @@ Matrix_t<T> Matrix_t<T>::operator+(Matrix_t &matrix) const {
 
 template<typename T>
 Matrix_t<T> Matrix_t<T>::operator-(Matrix_t &matrix) const {
-    Matrix_t subMatrix(rows_, matrix.getCols());
-    for(size_t i = 0; i < matrix.getCols(); ++i) {
-        for(size_t j = 0; j < rows_; ++j) {
-            subMatrix[cols_ * i + j] = matrix_[cols_ * i + j] - matrix[cols_ * i + j];
+    Matrix_t subMatrix(rows_, cols_);
+    for(size_t i = 0; i < rows_; ++i) {
+        for(size_t j = 0; j < cols_; ++j) {
+            subMatrix[i][j] = matrix_[i][j] - matrix[i][j];
         }
     }
     return subMatrix;
@@ -207,15 +197,19 @@ Matrix_t<T> Matrix_t<T>::operator-(Matrix_t &matrix) const {
 template<typename T>
 Matrix_t<T> Matrix_t<T>::inverse() const {
     Matrix_t inverseMatrix(rows_, cols_);
-    T *indentityMatrix = inverseMatrix.getIdentityMatrix();
+    inverseMatrix.getIdentityMatrix();
 
-    T *bufmatrix_ = new T[rows_ * cols_];
-    std::memcpy(bufmatrix_, matrix_, sizeof(T) * rows_ * cols_);
+    T **bufmatrix_ = new T *[rows_];
     for(size_t i = 0; i < rows_; ++i) {
-        T i_elem = bufmatrix_[cols_ * i + i];
+        bufmatrix_[i] = new T[cols_];
+        std::memcpy(bufmatrix_[i], matrix_[i], sizeof(T) * cols_);
+    }
+
+    for(size_t i = 0; i < rows_; ++i) {
+        T i_elem = bufmatrix_[i][i];
         for(size_t j = 0; j < cols_; ++j) {
-            bufmatrix_[cols_ * i + j] = bufmatrix_[cols_ * i + j] / i_elem;
-            indentityMatrix[cols_ * i + j] = indentityMatrix[cols_ * i + j] / i_elem;
+            bufmatrix_[i][j] = bufmatrix_[i][j] / i_elem;
+            inverseMatrix[i][j] = inverseMatrix[i][j] / i_elem;
         }
 
         for(size_t j = 0; j < rows_; ++j) {
@@ -223,15 +217,19 @@ Matrix_t<T> Matrix_t<T>::inverse() const {
                 continue;
             }
 
-            T i_elem = bufmatrix_[j * cols_ + i];
+            T i_elem = bufmatrix_[j][i];
             for(size_t k = 0; k < cols_; ++k) {
-                bufmatrix_[cols_ * j + k] = bufmatrix_[cols_ * j + k] - i_elem * bufmatrix_[cols_ * i + k];
-                indentityMatrix[cols_ * j + k] = indentityMatrix[cols_ * j + k] - i_elem * indentityMatrix[cols_ * i + k];
+                bufmatrix_[j][k] = bufmatrix_[j][k] - i_elem * bufmatrix_[i][k];
+                inverseMatrix[j][k] = inverseMatrix[j][k] - i_elem * inverseMatrix[i][k];
             }
         }
     }
 
-    delete []bufmatrix_;
+    for (size_t i = 0; i < rows_; ++i) {
+        delete[] bufmatrix_[i];
+    }
+    delete[] bufmatrix_;
+    
     return inverseMatrix;
 }
 
@@ -240,7 +238,7 @@ Matrix_t<T> Matrix_t<T>::transpose() const {
     Matrix_t transposeMatrix(cols_, rows_);
     for(size_t i = 0; i < rows_; ++i) {
         for(size_t j = 0; j < cols_; ++j) {
-            transposeMatrix[rows_ * j + i] = matrix_[cols_ * i + j];
+            transposeMatrix[j][i] = matrix_[i][j];
         }
     }
     return transposeMatrix;
@@ -249,30 +247,27 @@ Matrix_t<T> Matrix_t<T>::transpose() const {
 //-----------------------------Matrix input output-----------------------------
 
 template<typename T>
-std::istream &operator>>(std::istream &istr, Matrix_t<T> &matrix)
-{
+std::istream &operator>>(std::istream &istr, Matrix_t<T> &matrix) {
 	for(size_t i = 0; i < matrix.rows_; ++i) {
 		for(size_t j = 0; j < matrix.cols_; ++j)  {
     		istr >> std::ws;
-			istr >> matrix[matrix.cols_ * i + j];
-            std::cout << std::endl << std::endl << matrix.cols_ * i + j << std::endl << std::endl;
+			istr >> matrix[i][j];
     	}
 	}
 	return istr;
 }
 
 template<typename T>
-std::ostream &operator<<(std::ostream &ostr, const Matrix_t<T> &matrix)
-{
+std::ostream &operator<<(std::ostream &ostr, const Matrix_t<T> &matrix) {
     ostr << std::endl;
     ostr << matrix.rows_ << " " << matrix.cols_ << std::endl;
-	for(size_t i = 0; i < matrix.rows_; ++i) {
-		for(size_t j = 0; j < matrix.cols_; ++j)  {
-            ostr << matrix[matrix.cols_ * i + j] << " ";
+    for (size_t i = 0; i < matrix.rows_; ++i) {
+        for (size_t j = 0; j < matrix.cols_; ++j) {
+            ostr << matrix[i][j] << " ";
         }
         ostr << std::endl;
-	}
-	return ostr;
+    }
+    return ostr;
 }
 
 #endif // #define MATRIX_H_

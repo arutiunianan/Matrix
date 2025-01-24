@@ -482,6 +482,124 @@ TEST(Substraction, Subtestv_5) {
     ASSERT_TRUE(matrix - matrix == ans_matrix);
 }
 
+// ----------------------------------------------------------------------------------------
 
+TEST(Inverse, Subtestv_1) {
+    Matrix_t<double> matrix(3);
+    std::istringstream input("2 5 7 6 3 4 5 -2 -3");
+    input >> matrix;
+
+    Matrix_t<double> ans_matrix(3);
+    std::istringstream ans_input("1 -1 1 -38 41 -34 27 -29 24");
+    ans_input >> ans_matrix;
+
+    ASSERT_TRUE(matrix.inverse() == ans_matrix);
+}
+
+TEST(Inverse, Subtestv_2) {
+    Matrix_t<double> matrix(2);
+    std::istringstream input("1 2 3 4");
+    input >> matrix;
+
+    Matrix_t<double> ans_matrix(2);
+    std::istringstream ans_input("-2 1 1.5 -0.5");
+    ans_input >> ans_matrix;
+
+    ASSERT_TRUE(matrix.inverse() == ans_matrix);
+}
+
+TEST(Inverse, Subtestv_3) {
+    Matrix_t<double> matrix(3);
+    std::istringstream input("1 2 3 0 1 4 5 6 0");
+    input >> matrix;
+
+    Matrix_t<double> ans_matrix(3);
+    std::istringstream ans_input("-24 18 5 20 -15 -4 -5 4 1");
+    ans_input >> ans_matrix;
+
+    ASSERT_TRUE(matrix.inverse() == ans_matrix);
+}
+
+TEST(Inverse, Subtestv_4) {
+    Matrix_t<double> matrix(3);
+    std::istringstream input("3 0 2 2 0 -2 0 1 1");
+    input >> matrix;
+
+    Matrix_t<double> ans_matrix(3);
+    std::istringstream ans_input("0.2 0.2 0 -0.2 0.3 1 0.2 -0.3 0");
+    ans_input >> ans_matrix;
+
+    ASSERT_TRUE(matrix.inverse() == ans_matrix);
+}
+
+TEST(Inverse, Subtestv_5) {
+    Matrix_t<double> matrix(3);
+    std::istringstream input("2 0 1 0 -3 -1 -2 4 0");
+    input >> matrix;
+
+    Matrix_t<double> ans_matrix(3);
+    std::istringstream ans_input("2 2 1.5 1 1 1 -3 -4 -3");
+    ans_input >> ans_matrix;
+
+    ASSERT_TRUE(matrix.inverse() == ans_matrix);
+}
+
+TEST(Inverse, Subtestv_6) {
+    Matrix_t<double> matrix(3);
+    std::istringstream input("1 -1 1 2 1 1 1 1 2");
+    input >> matrix;
+
+    Matrix_t<double> ans_matrix(3);
+    std::istringstream ans_input("0.2 0.6 -0.4 -0.6 0.2 0.2 0.2 -0.4 0.6");
+    ans_input >> ans_matrix;
+
+    ASSERT_TRUE(matrix.inverse() == ans_matrix);
+}
+
+TEST(Inverse, Subtestv_7) {
+    Matrix_t<double> matrix(3);
+    matrix.getIdentityMatrix();
+
+    Matrix_t<double> ans_matrix(3);
+    ans_matrix.getIdentityMatrix();
+
+    ASSERT_TRUE(matrix.inverse() == ans_matrix);
+}
+
+TEST(Inverse, Subtestv_8) {
+    Matrix_t<double> matrix(2);
+    std::istringstream input("5 3 3 2");
+    input >> matrix;
+
+    Matrix_t<double> ans_matrix(2);
+    std::istringstream ans_input("2 -3 -3 5");
+    ans_input >> ans_matrix;
+
+    ASSERT_TRUE(matrix.inverse() == ans_matrix);
+}
+
+TEST(Inverse, Subtestv_9) {
+    Matrix_t<double> matrix(3);
+    std::istringstream input("3 -4 5 2 -3 1 3 -5 -1");
+    input >> matrix;
+
+    Matrix_t<double> ans_matrix(3);
+    std::istringstream ans_input("-8 29 -11 -5 18 -7 1 -3 1");
+    ans_input >> ans_matrix;
+
+    ASSERT_TRUE(matrix.inverse() == ans_matrix);
+}
+
+TEST(Inverse, Subtestv_10) {
+    Matrix_t<double> matrix(4);
+    std::istringstream input("1 2 3 4 2 3 1 2 1 1 1 -1 1 0 -2 -6");
+    input >> matrix;
+
+    Matrix_t<double> ans_matrix(4);
+    std::istringstream ans_input("22 -6 -26 17 -17 5 20 -13 -1 0 2 -1 4 -1 -5 3");
+    ans_input >> ans_matrix;
+
+    ASSERT_TRUE(matrix.inverse() == ans_matrix);
+}
 
 #endif // BASE_OPERATORS_H_

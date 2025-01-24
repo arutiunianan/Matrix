@@ -12,7 +12,7 @@ RUN apt update && apt install -y \
 
 WORKDIR /matrix
 
-COPY . /matrix
+COPY ../ /matrix
 
 RUN rm -rf build
 
