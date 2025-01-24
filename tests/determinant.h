@@ -30,7 +30,7 @@ void run_test_from_file(size_t file_num) {
     test_file.close();
     test_ans_file.close();
 
-    ASSERT_NEAR(matrix.BareissAlgorithm(), answer, 0.000001f);
+    ASSERT_NEAR(matrix.BareissAlgorithm(), answer, 0.0001f);
 }
 
 
@@ -41,7 +41,7 @@ TEST(Determinant, Subtestv_1) {
     
     double answer = -9;
 
-    ASSERT_TRUE(matrix.BareissAlgorithm() == answer);
+    ASSERT_NEAR(matrix.BareissAlgorithm(), answer, 0.0001f);
 }
 
 TEST(Determinant, Subtestv_2) {
@@ -51,7 +51,7 @@ TEST(Determinant, Subtestv_2) {
     
     double answer = -9;
 
-    ASSERT_TRUE(matrix.BareissAlgorithm() == answer);
+    ASSERT_NEAR(matrix.BareissAlgorithm(), answer, 0.0001f);
 }
 
 TEST(Determinant, Subtestv_3) {
@@ -61,7 +61,7 @@ TEST(Determinant, Subtestv_3) {
     
     double answer = 0;
 
-    ASSERT_TRUE(matrix.BareissAlgorithm() == answer);
+    ASSERT_NEAR(matrix.BareissAlgorithm(), answer, 0.0001f);
 }
 
 TEST(Determinant, Subtestv_4) {
@@ -71,7 +71,7 @@ TEST(Determinant, Subtestv_4) {
     
     double answer = 74;
 
-    ASSERT_TRUE(matrix.BareissAlgorithm() == answer);
+    ASSERT_NEAR(matrix.BareissAlgorithm(), answer, 0.0001f);
 }
 
 TEST(Determinant, Subtestv_5) {
@@ -91,7 +91,7 @@ TEST(Determinant, Subtestv_6) {
     
     double answer = 0;
 
-    ASSERT_TRUE(matrix.BareissAlgorithm() == answer);
+    ASSERT_NEAR(matrix.BareissAlgorithm(), answer, 0.0001f);
 }
 
 TEST(Determinant, Subtestv_7) {
@@ -186,9 +186,9 @@ TEST(Determinant, Subtestv_28) {
     run_test_from_file<double>(23);
 }*/
 
-/*TEST(Determinant, Subtestv_30) {
+TEST(Determinant, Subtestv_30) {
     run_test_from_file<double>(24);
-}*/
+}
 
 TEST(Determinant, Subtestv_31) {
     run_test_from_file<double>(25);

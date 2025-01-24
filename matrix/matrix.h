@@ -66,6 +66,7 @@ public:
     T **getIdentityMatrix();
 
     T BareissAlgorithm();
+    size_t maxInCol(Matrix_t upperTriangular, size_t j);
 
 private:
     size_t getSize() const {
@@ -179,7 +180,15 @@ T Matrix_t<T>::BareissAlgorithm() {
     Matrix_t upperTriangular(*this);
     T det = 1;
 
+    size_t max_ind;
     for(size_t j = 0; j < rows_ - 1; ++j) {
+        
+        max_ind = maxInCol(upperTriangular, j);
+        if(j != max_ind) {
+            det = -det;
+            std::swap(upperTriangular.matrix_[max_ind], upperTriangular.matrix_[j]);
+        }
+
         for(size_t i = j + 1; i < cols_; ++i) {
             T j_elem = upperTriangular[i][j];
             for(size_t k = 0; k < cols_; ++k) {
@@ -187,7 +196,6 @@ T Matrix_t<T>::BareissAlgorithm() {
                                       - j_elem * upperTriangular[j][k];
                 upperTriangular[i][k] /= upperTriangular[j][j];
             }
-
         }
     }
 
@@ -195,6 +203,20 @@ T Matrix_t<T>::BareissAlgorithm() {
         det *= upperTriangular[i][i];
     }
     return det;
+}
+
+template<typename T>
+size_t Matrix_t<T>::maxInCol(Matrix_t upperTriangular, size_t j) {
+    size_t max_ind = j;
+    T max_val = upperTriangular[j][j];
+
+    for(size_t i = j + 1; i < cols_; ++i) {
+        if(std::abs(max_val) < std::abs(upperTriangular[i][j])) {
+            max_ind = i;
+            max_val = upperTriangular[i][j];
+        }
+    }
+    return max_ind;
 }
 
 //-------------------------------Matrix operators-------------------------------
