@@ -1,4 +1,4 @@
-name: Triangles intersection pre-commit and post-push
+name: Matrix det pre-commit and post-push
 on:
   push:
     branches:
