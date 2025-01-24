@@ -24,17 +24,32 @@ private:
 
     class Row {
     public:
-        Row(T* row) : row_(row) {}
+        Row(T* row, size_t size) : row_(row), size_(size) {}
         T& operator[](size_t j) {
             return row_[j];
         }
+        void operator*(T value) const {
+            for(size_t i = 0; i < size_; ++i) {
+                row_[i] = row_[i] * value;
+            }
+        }
+        void operator/(T value) const {
+            for(size_t i = 0; i < row_; ++i) {
+                row_[i] = row_[i] / value;
+            }
+        }
     private:
         T* row_;
+        size_t size_;
     };
 
 public:
     Matrix_t(size_t rows, size_t cols);
     Matrix_t(size_t rows);
+    Matrix_t(const Matrix_t &matrix);
+    Matrix_t &operator=(const Matrix_t &matrix);
+    Matrix_t(Matrix_t &&matrix);
+    Matrix_t &operator=(Matrix_t &&matrix);
     ~Matrix_t();
 
     size_t getRows() const {
@@ -44,7 +59,7 @@ public:
         return cols_;
     }
 
-    Row         operator[](size_t index)       const;
+    Row         operator[](size_t index)        const;
     bool        operator==(Matrix_t<T> &matrix) const;
     Matrix_t<T> operator*(Matrix_t &matrix)     const;
     Matrix_t<T> operator*(T value)              const;
@@ -72,7 +87,7 @@ private:
 
 template<typename T>
 Matrix_t<T>::Matrix_t(size_t rows, size_t cols):
-    rows_(rows), cols_(cols){
+    rows_(rows), cols_(cols) {
     matrix_ = new T *[rows];
     for(size_t i = 0; i < rows; ++i) {
         matrix_[i] = new T[cols];
@@ -85,6 +100,66 @@ Matrix_t<T>::Matrix_t(size_t rows, size_t cols):
 template<typename T>
 Matrix_t<T>::Matrix_t(size_t rows):
     Matrix_t(rows, rows) {}
+
+template<typename T>
+Matrix_t<T>::Matrix_t(const Matrix_t &matrix):
+    rows_(matrix.getRows()), cols_(matrix.getCols()) {
+    matrix_ = new T *[rows_];
+    for(size_t i = 0; i < rows_; ++i) {
+        matrix_[i] = new T[cols_];
+        std::memcpy(matrix_[i], matrix.matrix_[i], sizeof(T) * cols_);
+    }
+}
+
+template<typename T>
+Matrix_t<T> &Matrix_t<T>::operator=(const Matrix_t& matrix) {
+    if (this == &matrix) {
+        return *this;
+    }
+
+    rows_ = matrix.getRows();
+    cols_ = matrix.getCols();
+    matrix_ = new T *[rows_];
+    for(size_t i = 0; i < rows_; ++i) {
+        matrix_[i] = new T[cols_];
+        std::memcpy(matrix_[i], matrix.matrix_[i], sizeof(T) * cols_);
+    }
+    return *this;
+}
+
+template<typename T>
+Matrix_t<T>::Matrix_t(Matrix_t &&matrix):
+    rows_(matrix.getRows()), cols_(matrix.getCols()) {
+    matrix_ = matrix.matrix_;
+    
+    matrix.matrix_ = new T *[rows_];
+    for(size_t i = 0; i < rows_; ++i) {
+        matrix.matrix_[i] = new T[cols_];
+        for(size_t j = 0; j < cols_; ++j) {
+            matrix.matrix_[i][j] = 0;
+        }
+    }
+}
+
+template<typename T>
+Matrix_t<T> &Matrix_t<T>::operator=(Matrix_t &&matrix) {
+    if (this == &matrix) {
+        return *this;
+    }
+
+    rows_ = matrix.getRows();
+    cols_ = matrix.getCols();
+    matrix_ = matrix.matrix_;
+
+    matrix.matrix_ = new T *[rows_];
+    for(size_t i = 0; i < rows_; ++i) {
+        matrix.matrix_[i] = new T[cols_];
+        for(size_t j = 0; j < cols_; ++j) {
+            matrix.matrix_[i][j] = 0;
+        }
+    }
+    return *this;
+}
 
 template<typename T>
 Matrix_t<T>::~Matrix_t() {
@@ -103,19 +178,23 @@ T **Matrix_t<T>::getIdentityMatrix() {
     }
     return matrix_;
 }
-/*
+
 //--------------------Implementation of the Bareiss algorithm-------------------
 
-template<typename T>
+/*template<typename T>
 T Matrix_t<T>::BareissAlgorithm() {
-    
-}
+    Matrix_t upperTriangular(*this);
+    upperTriangular[0][2] = -6;
+    std::cout << upperTriangular;
+
+    return matrix_[0][0];
+}*/
 
 //-------------------------------Matrix operators-------------------------------
-*/
+
 template<typename T>
 Matrix_t<T>::Row Matrix_t<T>::operator[](size_t index) const {
-    return Row(matrix_[index]);
+    return Row(matrix_[index], cols_);
 }
 
 template<typename T>
