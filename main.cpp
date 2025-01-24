@@ -5,5 +5,5 @@ int main() {
     std::cin >> N;
     Matrix_t<double> matrix(N);
     std::cin >> matrix;
-    std::cout << matrix;
+    std::cout << matrix.BareissAlgorithm() << std::endl;
 }

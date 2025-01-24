@@ -24,20 +24,13 @@ private:
 
     class Row {
     public:
-        Row(T* row, size_t size) : row_(row), size_(size) {}
-        T& operator[](size_t j) {
-            return row_[j];
+        Row(T* row, size_t size):
+            row_(row), size_(size) {}
+
+        T& operator[](size_t i) {
+            return row_[i];
         }
-        void operator*(T value) const {
-            for(size_t i = 0; i < size_; ++i) {
-                row_[i] = row_[i] * value;
-            }
-        }
-        void operator/(T value) const {
-            for(size_t i = 0; i < row_; ++i) {
-                row_[i] = row_[i] / value;
-            }
-        }
+
     private:
         T* row_;
         size_t size_;
@@ -67,7 +60,7 @@ public:
     Matrix_t<T> operator+(Matrix_t &matrix)     const;
     Matrix_t<T> operator-(Matrix_t &matrix)     const;
 
-    Matrix_t<T> inverse() const;
+    Matrix_t<T> inverse()   const;
     Matrix_t<T> transpose() const;
 
     T **getIdentityMatrix();
@@ -181,14 +174,28 @@ T **Matrix_t<T>::getIdentityMatrix() {
 
 //--------------------Implementation of the Bareiss algorithm-------------------
 
-/*template<typename T>
+template<typename T>
 T Matrix_t<T>::BareissAlgorithm() {
     Matrix_t upperTriangular(*this);
-    upperTriangular[0][2] = -6;
-    std::cout << upperTriangular;
+    T det = 1;
 
-    return matrix_[0][0];
-}*/
+    for(size_t j = 0; j < rows_ - 1; ++j) {
+        for(size_t i = j + 1; i < cols_; ++i) {
+            T j_elem = upperTriangular[i][j];
+            for(size_t k = 0; k < cols_; ++k) {
+                upperTriangular[i][k] = upperTriangular[j][j] * upperTriangular[i][k]
+                                      - j_elem * upperTriangular[j][k];
+                upperTriangular[i][k] /= upperTriangular[j][j];
+            }
+
+        }
+    }
+
+    for(size_t i = 0; i < rows_; ++i) { 
+        det *= upperTriangular[i][i];
+    }
+    return det;
+}
 
 //-------------------------------Matrix operators-------------------------------
 

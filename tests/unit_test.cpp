@@ -1,4 +1,5 @@
 #include "base_operators.h"
+#include "determinant.h"
 
 int main(int argc, char **argv)
 {
