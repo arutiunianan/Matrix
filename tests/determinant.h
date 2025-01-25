@@ -170,9 +170,9 @@ TEST(Determinant, Subtestv_25) {
     run_test_from_file<double>(19);
 }
 
-/*TEST(Determinant, Subtestv_26) {
+TEST(Determinant, Subtestv_26) {
     run_test_from_file<double>(20);
-}*/
+}
 
 TEST(Determinant, Subtestv_27) {
     run_test_from_file<double>(21);
@@ -182,9 +182,9 @@ TEST(Determinant, Subtestv_28) {
     run_test_from_file<double>(22);
 }
 
-/*TEST(Determinant, Subtestv_29) {
+TEST(Determinant, Subtestv_29) {
     run_test_from_file<double>(23);
-}*/
+}
 
 TEST(Determinant, Subtestv_30) {
     run_test_from_file<double>(24);

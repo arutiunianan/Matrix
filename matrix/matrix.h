@@ -194,6 +194,10 @@ T Matrix_t<T>::BareissAlgorithm() {
             for(size_t k = 0; k < cols_; ++k) {
                 upperTriangular[i][k] = upperTriangular[j][j] * upperTriangular[i][k]
                                       - j_elem * upperTriangular[j][k];
+                
+                if(upperTriangular[j][j] == 0) {
+                    return 0;
+                }
                 upperTriangular[i][k] /= upperTriangular[j][j];
             }
         }
