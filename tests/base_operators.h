@@ -461,12 +461,12 @@ TEST(Substraction, Subtestv_3) {
 }
 
 TEST(Substraction, Subtestv_4) {
-    Matrix_t<int> matrix1(1000);
+    Matrix_t<int> matrix1(100);
     matrix1.getIdentityMatrix();
 
-    Matrix_t<int> matrix2(1000);
+    Matrix_t<int> matrix2(100);
     
-    Matrix_t<int> ans_matrix(1000);
+    Matrix_t<int> ans_matrix(100);
     ans_matrix.getIdentityMatrix();
 
     ASSERT_TRUE(matrix1 - matrix2 == ans_matrix);

@@ -73,6 +73,9 @@ private:
         return rows_ * cols_;
     }
 
+    T **allocateMatrix(size_t rows, size_t cols)                 const;
+    T **allocateMatrix(size_t rows, size_t cols, T **copymatrix) const;
+
     friend std::ostream &operator<< <T>(std::ostream &ostr, const Matrix_t<T> &matrix);
 	friend std::istream &operator>> <T>(std::istream &istr, Matrix_t<T> &matrix);
 };
@@ -81,15 +84,7 @@ private:
 
 template<typename T>
 Matrix_t<T>::Matrix_t(size_t rows, size_t cols):
-    rows_(rows), cols_(cols) {
-    matrix_ = new T *[rows];
-    for(size_t i = 0; i < rows; ++i) {
-        matrix_[i] = new T[cols];
-        for(size_t j = 0; j < cols; ++j) {
-            matrix_[i][j] = 0;
-        }
-    }
-}
+    rows_(rows), cols_(cols), matrix_(allocateMatrix(rows, cols)) {}
 
 template<typename T>
 Matrix_t<T>::Matrix_t(size_t rows):
@@ -97,13 +92,8 @@ Matrix_t<T>::Matrix_t(size_t rows):
 
 template<typename T>
 Matrix_t<T>::Matrix_t(const Matrix_t &matrix):
-    rows_(matrix.getRows()), cols_(matrix.getCols()) {
-    matrix_ = new T *[rows_];
-    for(size_t i = 0; i < rows_; ++i) {
-        matrix_[i] = new T[cols_];
-        std::memcpy(matrix_[i], matrix.matrix_[i], sizeof(T) * cols_);
-    }
-}
+    rows_(matrix.getRows()), cols_(matrix.getCols()), 
+    matrix_(allocateMatrix(matrix.getRows(), matrix.getCols(), matrix.matrix_)) {}
 
 template<typename T>
 Matrix_t<T> &Matrix_t<T>::operator=(const Matrix_t& matrix) {
@@ -113,26 +103,14 @@ Matrix_t<T> &Matrix_t<T>::operator=(const Matrix_t& matrix) {
 
     rows_ = matrix.getRows();
     cols_ = matrix.getCols();
-    matrix_ = new T *[rows_];
-    for(size_t i = 0; i < rows_; ++i) {
-        matrix_[i] = new T[cols_];
-        std::memcpy(matrix_[i], matrix.matrix_[i], sizeof(T) * cols_);
-    }
+    matrix_ = allocateMatrix(rows_, cols_, matrix.matrix_);
     return *this;
 }
 
 template<typename T>
 Matrix_t<T>::Matrix_t(Matrix_t &&matrix):
-    rows_(matrix.getRows()), cols_(matrix.getCols()) {
-    matrix_ = matrix.matrix_;
-    
-    matrix.matrix_ = new T *[rows_];
-    for(size_t i = 0; i < rows_; ++i) {
-        matrix.matrix_[i] = new T[cols_];
-        for(size_t j = 0; j < cols_; ++j) {
-            matrix.matrix_[i][j] = 0;
-        }
-    }
+    rows_(matrix.getRows()), cols_(matrix.getCols()), matrix_(matrix.matrix_) {
+    matrix.matrix_ = allocateMatrix(rows_, cols_);
 }
 
 template<typename T>
@@ -145,13 +123,7 @@ Matrix_t<T> &Matrix_t<T>::operator=(Matrix_t &&matrix) {
     cols_ = matrix.getCols();
     matrix_ = matrix.matrix_;
 
-    matrix.matrix_ = new T *[rows_];
-    for(size_t i = 0; i < rows_; ++i) {
-        matrix.matrix_[i] = new T[cols_];
-        for(size_t j = 0; j < cols_; ++j) {
-            matrix.matrix_[i][j] = 0;
-        }
-    }
+    matrix.matrix_ = allocateMatrix(rows_, cols_);
     return *this;
 }
 
@@ -161,6 +133,29 @@ Matrix_t<T>::~Matrix_t() {
         delete[] matrix_[i];
     }
     delete[] matrix_;
+}
+
+template<typename T>
+T **Matrix_t<T>::allocateMatrix(size_t rows, size_t cols) const {
+    T **matrix = new T *[rows];
+    for(size_t i = 0; i < rows; ++i) {
+        matrix[i] = new T[cols];
+        std::fill(matrix[i], matrix[i] + cols, 0);
+    }
+
+    return matrix;
+}
+
+template<typename T>
+T **Matrix_t<T>::allocateMatrix(size_t rows, size_t cols, 
+                                T **copymatrix) const {
+    T **matrix = new T *[rows];
+    for(size_t i = 0; i < rows; ++i) {
+        matrix[i] = new T[cols];
+        std::memcpy(matrix[i], copymatrix[i], sizeof(T) * cols_);
+    }
+
+    return matrix;
 }
 
 template<typename T>
@@ -311,11 +306,7 @@ Matrix_t<T> Matrix_t<T>::inverse() const {
     Matrix_t inverseMatrix(rows_, cols_);
     inverseMatrix.getIdentityMatrix();
 
-    T **bufmatrix_ = new T *[rows_];
-    for(size_t i = 0; i < rows_; ++i) {
-        bufmatrix_[i] = new T[cols_];
-        std::memcpy(bufmatrix_[i], matrix_[i], sizeof(T) * cols_);
-    }
+    T **bufmatrix_ = allocateMatrix(rows_, cols_, matrix_);
 
     for(size_t i = 0; i < rows_; ++i) {
         T i_elem = bufmatrix_[i][i];
