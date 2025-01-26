@@ -21,21 +21,7 @@ private:
     size_t rows_;
     size_t cols_;
     T **matrix_;
-
-    class Row {
-    public:
-        Row(T* row, size_t size):
-            row_(row), size_(size) {}
-
-        T& operator[](size_t i) {
-            return row_[i];
-        }
-
-    private:
-        T* row_;
-        size_t size_;
-    };
-
+    
 public:
     Matrix_t(size_t rows, size_t cols);
     Matrix_t(size_t rows);
@@ -45,14 +31,13 @@ public:
     Matrix_t &operator=(Matrix_t &&matrix);
     ~Matrix_t();
 
-    size_t getRows() const {
+    size_t getRows() const noexcept {
         return rows_;
     }
-    size_t getCols() const {
+    size_t getCols() const noexcept {
         return cols_;
     }
 
-    Row         operator[](size_t index)        const;
     bool        operator==(Matrix_t<T> &matrix) const;
     Matrix_t<T> operator*(Matrix_t &matrix)     const;
     Matrix_t<T> operator*(T value)              const;
@@ -66,10 +51,10 @@ public:
     T **getIdentityMatrix();
 
     T BareissAlgorithm();
-    size_t maxInCol(Matrix_t upperTriangular, size_t j);
+    size_t maxInCol(T **upperTriangular, size_t j) const;
 
 private:
-    size_t getSize() const {
+    size_t getSize() const noexcept {
         return rows_ * cols_;
     }
 
@@ -178,34 +163,35 @@ T Matrix_t<T>::BareissAlgorithm() {
     size_t max_ind;
     for(size_t j = 0; j < rows_ - 1; ++j) {
         
-        max_ind = maxInCol(upperTriangular, j);
+        max_ind = maxInCol(upperTriangular.matrix_, j);
         if(j != max_ind) {
             det = -det;
             std::swap(upperTriangular.matrix_[max_ind], upperTriangular.matrix_[j]);
         }
 
         for(size_t i = j + 1; i < cols_; ++i) {
-            T j_elem = upperTriangular[i][j];
+            T j_elem = upperTriangular.matrix_[i][j];
             for(size_t k = 0; k < cols_; ++k) {
-                upperTriangular[i][k] = upperTriangular[j][j] * upperTriangular[i][k]
-                                      - j_elem * upperTriangular[j][k];
+                upperTriangular.matrix_[i][k] = 
+                    upperTriangular.matrix_[j][j] * upperTriangular.matrix_[i][k]
+                    - j_elem * upperTriangular.matrix_[j][k];
                 
-                if(upperTriangular[j][j] == 0) {
+                if(upperTriangular.matrix_[j][j] == 0) {
                     return 0;
                 }
-                upperTriangular[i][k] /= upperTriangular[j][j];
+                upperTriangular.matrix_[i][k] /= upperTriangular.matrix_[j][j];
             }
         }
     }
 
     for(size_t i = 0; i < rows_; ++i) { 
-        det *= upperTriangular[i][i];
+        det *= upperTriangular.matrix_[i][i];
     }
     return det;
 }
 
 template<typename T>
-size_t Matrix_t<T>::maxInCol(Matrix_t upperTriangular, size_t j) {
+size_t Matrix_t<T>::maxInCol(T **upperTriangular, size_t j) const {
     size_t max_ind = j;
     T max_val = upperTriangular[j][j];
 
@@ -221,11 +207,6 @@ size_t Matrix_t<T>::maxInCol(Matrix_t upperTriangular, size_t j) {
 //-------------------------------Matrix operators-------------------------------
 
 template<typename T>
-Matrix_t<T>::Row Matrix_t<T>::operator[](size_t index) const {
-    return Row(matrix_[index], cols_);
-}
-
-template<typename T>
 bool Matrix_t<T>::operator==(Matrix_t<T> &matrix) const {
     if(rows_ != matrix.getRows()) {
         return false;
@@ -236,7 +217,7 @@ bool Matrix_t<T>::operator==(Matrix_t<T> &matrix) const {
 
     for(size_t i = 0; i < rows_; ++i) {
         for(size_t j = 0; j < cols_; ++j) {
-            if(std::fabs(matrix_[i][j] - matrix[i][j]) > epsilon) {
+            if(std::fabs(matrix_[i][j] - matrix.matrix_[i][j]) > epsilon) {
                 return false;
             }
         }
@@ -250,7 +231,7 @@ Matrix_t<T> Matrix_t<T>::operator*(Matrix_t &matrix) const {
     for(size_t i = 0; i < rows_; ++i) {
         for(size_t j = 0; j < matrix.getCols(); ++j) {
             for(size_t k = 0; k < cols_; ++k) {
-                mulMatrix[i][j] += matrix_[i][k] * matrix[k][j];
+                mulMatrix.matrix_[i][j] += matrix_[i][k] * matrix.matrix_[k][j];
             }
         }
     }
@@ -262,7 +243,7 @@ Matrix_t<T> Matrix_t<T>::operator*(T value) const {
     Matrix_t mulMatrix(rows_, cols_);
     for(size_t i = 0; i < rows_; ++i) {
         for(size_t j = 0; j < cols_; ++j) {
-            mulMatrix[i][j] = matrix_[i][j] * value;
+            mulMatrix.matrix_[i][j] = matrix_[i][j] * value;
         }
     }
     return mulMatrix;
@@ -273,7 +254,7 @@ Matrix_t<T> Matrix_t<T>::operator/(T value) const {
     Matrix_t divMatrix(rows_, cols_);
     for(size_t i = 0; i < rows_; ++i) {
         for(size_t j = 0; j < cols_; ++j) {
-            divMatrix[i][j] = matrix_[i][j] / value;
+            divMatrix.matrix_[i][j] = matrix_[i][j] / value;
         }
     }
     return divMatrix;
@@ -284,7 +265,7 @@ Matrix_t<T> Matrix_t<T>::operator+(Matrix_t &matrix) const {
     Matrix_t addMatrix(rows_, cols_);
     for(size_t i = 0; i < rows_; ++i) {
         for(size_t j = 0; j < cols_; ++j) {
-            addMatrix[i][j] = matrix_[i][j] + matrix[i][j];
+            addMatrix.matrix_[i][j] = matrix_[i][j] + matrix.matrix_[i][j];
         }
     }
     return addMatrix;
@@ -295,7 +276,7 @@ Matrix_t<T> Matrix_t<T>::operator-(Matrix_t &matrix) const {
     Matrix_t subMatrix(rows_, cols_);
     for(size_t i = 0; i < rows_; ++i) {
         for(size_t j = 0; j < cols_; ++j) {
-            subMatrix[i][j] = matrix_[i][j] - matrix[i][j];
+            subMatrix.matrix_[i][j] = matrix_[i][j] - matrix.matrix_[i][j];
         }
     }
     return subMatrix;
@@ -304,7 +285,7 @@ Matrix_t<T> Matrix_t<T>::operator-(Matrix_t &matrix) const {
 template<typename T>
 Matrix_t<T> Matrix_t<T>::inverse() const {
     Matrix_t inverseMatrix(rows_, cols_);
-    inverseMatrix.getIdentityMatrix();
+    T **indentitymatrix_ = inverseMatrix.getIdentityMatrix();
 
     T **bufmatrix_ = allocateMatrix(rows_, cols_, matrix_);
 
@@ -312,7 +293,7 @@ Matrix_t<T> Matrix_t<T>::inverse() const {
         T i_elem = bufmatrix_[i][i];
         for(size_t j = 0; j < cols_; ++j) {
             bufmatrix_[i][j] = bufmatrix_[i][j] / i_elem;
-            inverseMatrix[i][j] = inverseMatrix[i][j] / i_elem;
+            indentitymatrix_[i][j] = indentitymatrix_[i][j] / i_elem;
         }
 
         for(size_t j = 0; j < rows_; ++j) {
@@ -323,7 +304,7 @@ Matrix_t<T> Matrix_t<T>::inverse() const {
             T i_elem = bufmatrix_[j][i];
             for(size_t k = 0; k < cols_; ++k) {
                 bufmatrix_[j][k] = bufmatrix_[j][k] - i_elem * bufmatrix_[i][k];
-                inverseMatrix[j][k] = inverseMatrix[j][k] - i_elem * inverseMatrix[i][k];
+                indentitymatrix_[j][k] = indentitymatrix_[j][k] - i_elem * indentitymatrix_[i][k];
             }
         }
     }
@@ -341,7 +322,7 @@ Matrix_t<T> Matrix_t<T>::transpose() const {
     Matrix_t transposeMatrix(cols_, rows_);
     for(size_t i = 0; i < rows_; ++i) {
         for(size_t j = 0; j < cols_; ++j) {
-            transposeMatrix[j][i] = matrix_[i][j];
+            transposeMatrix.matrix_[j][i] = matrix_[i][j];
         }
     }
     return transposeMatrix;
@@ -354,7 +335,7 @@ std::istream &operator>>(std::istream &istr, Matrix_t<T> &matrix) {
 	for(size_t i = 0; i < matrix.rows_; ++i) {
 		for(size_t j = 0; j < matrix.cols_; ++j)  {
     		istr >> std::ws;
-			istr >> matrix[i][j];
+			istr >> matrix.matrix_[i][j];
     	}
 	}
 	return istr;
@@ -366,7 +347,7 @@ std::ostream &operator<<(std::ostream &ostr, const Matrix_t<T> &matrix) {
     ostr << matrix.rows_ << " " << matrix.cols_ << std::endl;
     for (size_t i = 0; i < matrix.rows_; ++i) {
         for (size_t j = 0; j < matrix.cols_; ++j) {
-            ostr << matrix[i][j] << " ";
+            ostr << matrix.matrix_[i][j] << " ";
         }
         ostr << std::endl;
     }
