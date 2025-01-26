@@ -5,6 +5,8 @@
 #include <cstring>
 #include <cmath>
 
+#include "exceptions.h"
+
 const double epsilon = 1e-9;
 
 template<typename T>
@@ -50,7 +52,7 @@ public:
 
     T **getIdentityMatrix();
 
-    T BareissAlgorithm();
+    T BareissAlgorithm() const;
     size_t maxInCol(T **upperTriangular, size_t j) const;
 
 private:
@@ -145,6 +147,10 @@ T **Matrix_t<T>::allocateMatrix(size_t rows, size_t cols,
 
 template<typename T>
 T **Matrix_t<T>::getIdentityMatrix() {
+    if(rows_ != cols_) {
+        throw NonSquareMatrix{};
+    }
+
     for(size_t i = 0; i < rows_; ++i) {
         for(size_t j = 0; j < cols_; ++j) {
             matrix_[i][j] = (i == j) ? 1 : 0;
@@ -156,7 +162,11 @@ T **Matrix_t<T>::getIdentityMatrix() {
 //--------------------Implementation of the Bareiss algorithm-------------------
 
 template<typename T>
-T Matrix_t<T>::BareissAlgorithm() {
+T Matrix_t<T>::BareissAlgorithm() const {
+    if(rows_ != cols_) {
+        throw NonSquareMatrix{};
+    }
+
     Matrix_t upperTriangular(*this);
     T det = 1;
 
@@ -227,6 +237,10 @@ bool Matrix_t<T>::operator==(Matrix_t<T> &matrix) const {
 
 template<typename T>
 Matrix_t<T> Matrix_t<T>::operator*(Matrix_t &matrix) const {
+    if(cols_ != matrix.getRows()) {
+        throw DimensionMismatch{};
+    }
+
     Matrix_t mulMatrix(rows_, matrix.getCols());
     for(size_t i = 0; i < rows_; ++i) {
         for(size_t j = 0; j < matrix.getCols(); ++j) {
@@ -251,6 +265,10 @@ Matrix_t<T> Matrix_t<T>::operator*(T value) const {
 
 template<typename T>
 Matrix_t<T> Matrix_t<T>::operator/(T value) const {
+    if(value == 0) {
+        throw DevisionByZero{};
+    }
+
     Matrix_t divMatrix(rows_, cols_);
     for(size_t i = 0; i < rows_; ++i) {
         for(size_t j = 0; j < cols_; ++j) {
@@ -262,6 +280,10 @@ Matrix_t<T> Matrix_t<T>::operator/(T value) const {
 
 template<typename T>
 Matrix_t<T> Matrix_t<T>::operator+(Matrix_t &matrix) const {
+    if(rows_ != matrix.getRows() || cols_ != matrix.getCols()) {
+        throw DimensionMismatch{};
+    }
+
     Matrix_t addMatrix(rows_, cols_);
     for(size_t i = 0; i < rows_; ++i) {
         for(size_t j = 0; j < cols_; ++j) {
@@ -273,6 +295,10 @@ Matrix_t<T> Matrix_t<T>::operator+(Matrix_t &matrix) const {
 
 template<typename T>
 Matrix_t<T> Matrix_t<T>::operator-(Matrix_t &matrix) const {
+    if(rows_ != matrix.getRows() || cols_ != matrix.getCols()) {
+        throw DimensionMismatch{};
+    }
+
     Matrix_t subMatrix(rows_, cols_);
     for(size_t i = 0; i < rows_; ++i) {
         for(size_t j = 0; j < cols_; ++j) {
@@ -284,6 +310,10 @@ Matrix_t<T> Matrix_t<T>::operator-(Matrix_t &matrix) const {
 
 template<typename T>
 Matrix_t<T> Matrix_t<T>::inverse() const {
+    if(BareissAlgorithm() == 0) {
+        throw DeterminantIsZero{};
+    }
+
     Matrix_t inverseMatrix(rows_, cols_);
     T **indentitymatrix_ = inverseMatrix.getIdentityMatrix();
 
