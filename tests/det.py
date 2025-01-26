@@ -10,7 +10,7 @@ def read_matrix_from_file(filename):
     return np.array(matrix)
 
 if __name__ == '__main__':
-    filename = 'test_files/file24.txt'
+    filename = 'tests/test_files/file1.txt'
     matrix = read_matrix_from_file(filename)
     
     determinant = np.linalg.det(matrix)
