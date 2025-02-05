@@ -4,6 +4,7 @@
 #include <iostream>
 #include <cstring>
 #include <cmath>
+#include <utility>
 
 #include "exceptions.h"
 
@@ -84,17 +85,17 @@ Matrix_t<T> &Matrix_t<T>::operator=(const Matrix_t& matrix) {
         return *this;
     }
 
-    rows_ = matrix.getRows();
-    cols_ = matrix.getCols();
+    rows_   = matrix.getRows();
+    cols_   = matrix.getCols();
     matrix_ = allocateMatrix(rows_, cols_, matrix.matrix_);
     return *this;
 }
 
 template<typename T>
 Matrix_t<T>::Matrix_t(Matrix_t &&matrix):
-    rows_(matrix.getRows()), cols_(matrix.getCols()), matrix_(matrix.matrix_) {
-    matrix.matrix_ = allocateMatrix(rows_, cols_);
-}
+    rows_(std::exchange(matrix.rows_, 0)),
+    cols_(std::exchange(matrix.cols_, 0)),
+    matrix_(std::exchange(matrix.matrix_, nullptr)) {}
 
 template<typename T>
 Matrix_t<T> &Matrix_t<T>::operator=(Matrix_t &&matrix) {
@@ -102,11 +103,9 @@ Matrix_t<T> &Matrix_t<T>::operator=(Matrix_t &&matrix) {
         return *this;
     }
 
-    rows_ = matrix.getRows();
-    cols_ = matrix.getCols();
-    matrix_ = matrix.matrix_;
-
-    matrix.matrix_ = allocateMatrix(rows_, cols_);
+    rows_   = std::exchange(matrix.rows_, rows_);
+    cols_   = std::exchange(matrix.cols_, cols_);
+    matrix_ = std::exchange(matrix.matrix_, matrix_);
     return *this;
 }
 
