@@ -13,25 +13,25 @@ public:
 class DimensionMismatch: public MatrixException {
 public:
     explicit DimensionMismatch(): 
-        MatrixException("\nDimension Mismatch") {}
+        MatrixException("\n Dimension Mismatch") {}
 };
 
 class DevisionByZero: public MatrixException {
 public:
     explicit DevisionByZero(): 
-        MatrixException("\nDivision by Zero") {}
+        MatrixException("\n Division by Zero") {}
 };
 
 class NonSquareMatrix: public MatrixException {
 public:
     explicit NonSquareMatrix(): 
-        MatrixException("\nNon-Square Matrix") {}
+        MatrixException("\n Non-Square Matrix") {}
 };
 
 class DeterminantIsZero: public MatrixException {
 public:
     explicit DeterminantIsZero(): 
-        MatrixException("\nDeterminant is Zero") {}
+        MatrixException("\n Determinant is Zero") {}
 };
 
 #endif // #define EXEPTION_H_

@@ -40,7 +40,7 @@ void run_test_from_file(size_t file_num) {
 
 TEST(Determinant, Subtestv_1) {
     Matrix_t<double> matrix(3);
-    std::istringstream input("4 2 3 4 5 6 7 8 9");
+    std::istringstream input("4 2 3 4 5 6 7 8 9\n");
     input >> matrix;
     
     double answer = -9;
@@ -50,7 +50,7 @@ TEST(Determinant, Subtestv_1) {
 
 TEST(Determinant, Subtestv_2) {
     Matrix_t<double> matrix(3);
-    std::istringstream input("4 2 3 4 5 6 7 8 9");
+    std::istringstream input("4 2 3 4 5 6 7 8 9\n");
     input >> matrix;
     
     double answer = -9;
@@ -60,7 +60,7 @@ TEST(Determinant, Subtestv_2) {
 
 TEST(Determinant, Subtestv_3) {
     Matrix_t<double> matrix(4);
-    std::istringstream input("2 4 -1 1 -1 2 1 -1 1 -6 3 -1 2 0 3 -1");
+    std::istringstream input("2 4 -1 1 -1 2 1 -1 1 -6 3 -1 2 0 3 -1\n");
     input >> matrix;
     
     double answer = 0;
@@ -70,7 +70,7 @@ TEST(Determinant, Subtestv_3) {
 
 TEST(Determinant, Subtestv_4) {
     Matrix_t<double> matrix(3);
-    std::istringstream input("1 5 3 2 4 7 4 6 2");
+    std::istringstream input("1 5 3 2 4 7 4 6 2\n");
     input >> matrix;
     
     double answer = 74;

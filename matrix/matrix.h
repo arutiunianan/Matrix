@@ -8,7 +8,7 @@
 
 #include "exceptions.h"
 
-const double epsilon = 1e-9;
+constexpr double epsilon = 1e-9;
 
 template<typename T>
 class Matrix_t;
@@ -19,7 +19,7 @@ template<typename T>
 std::ostream &operator<<(std::ostream &ostr, const Matrix_t<T> &matrix);
 
 template<typename T>
-class Matrix_t {
+class Matrix_t final {
 private:
     size_t rows_;
     size_t cols_;
@@ -40,6 +40,12 @@ public:
     size_t getCols() const noexcept {
         return cols_;
     }
+    T& at(size_t row, size_t col) {
+        return matrix_[row][col];
+    }
+    const T& at(size_t row, size_t col) const {
+        return matrix_[row][col];
+    }
 
     bool        operator==(const Matrix_t<T> &matrix) const;
     Matrix_t<T> operator*(const Matrix_t &matrix)     const;
@@ -57,11 +63,8 @@ public:
     size_t maxInCol(T **upperTriangular, size_t j) const;
 
 private:
-    T **allocateMatrix(size_t rows, size_t cols)                 const;
-    T **allocateMatrix(size_t rows, size_t cols, T **copymatrix) const;
-
-    friend std::ostream &operator<< <T>(std::ostream &ostr, const Matrix_t<T> &matrix);
-	friend std::istream &operator>> <T>(std::istream &istr, Matrix_t<T> &matrix);
+    static T **allocateMatrix(size_t rows, size_t cols);
+    static T **allocateMatrix(size_t rows, size_t cols, T **copymatrix);
 };
 
 //-------------------------Constructors and destructors-------------------------
@@ -87,7 +90,9 @@ Matrix_t<T> &Matrix_t<T>::operator=(const Matrix_t& matrix) {
 
     rows_   = matrix.getRows();
     cols_   = matrix.getCols();
-    matrix_ = allocateMatrix(rows_, cols_, matrix.matrix_);
+
+    Matrix_t<T> tmp(matrix);
+    std::swap(tmp);
     return *this;
 }
 
@@ -118,7 +123,7 @@ Matrix_t<T>::~Matrix_t() {
 }
 
 template<typename T>
-T **Matrix_t<T>::allocateMatrix(size_t rows, size_t cols) const {
+T **Matrix_t<T>::allocateMatrix(size_t rows, size_t cols) {
     T **matrix = new T *[rows];
     for(size_t i = 0; i < rows; ++i) {
         matrix[i] = new T[cols];
@@ -129,12 +134,11 @@ T **Matrix_t<T>::allocateMatrix(size_t rows, size_t cols) const {
 }
 
 template<typename T>
-T **Matrix_t<T>::allocateMatrix(size_t rows, size_t cols, 
-                                T **copymatrix) const {
+T **Matrix_t<T>::allocateMatrix(size_t rows, size_t cols, T **copymatrix) {
     T **matrix = new T *[rows];
     for(size_t i = 0; i < rows; ++i) {
         matrix[i] = new T[cols];
-        std::memcpy(matrix[i], copymatrix[i], sizeof(T) * cols_);
+        std::memcpy(matrix[i], copymatrix[i], sizeof(T) * cols);
     }
 
     return matrix;
@@ -180,7 +184,7 @@ T Matrix_t<T>::BareissAlgorithm() const {
                     upperTriangular.matrix_[j][j] * upperTriangular.matrix_[i][k]
                     - j_elem * upperTriangular.matrix_[j][k];
                 
-                if(upperTriangular.matrix_[j][j] == 0) {
+                if(std::abs(upperTriangular.matrix_[j][j]) < epsilon) {
                     return 0;
                 }
                 upperTriangular.matrix_[i][k] /= upperTriangular.matrix_[j][j];
@@ -304,7 +308,7 @@ Matrix_t<T> Matrix_t<T>::operator-(const Matrix_t &matrix) const {
 
 template<typename T>
 Matrix_t<T> Matrix_t<T>::inverse() const {
-    if(BareissAlgorithm() == 0) {
+    if(std::abs(BareissAlgorithm()) < epsilon) {
         throw DeterminantIsZero{};
     }
 
@@ -356,10 +360,13 @@ Matrix_t<T> Matrix_t<T>::transpose() const {
 
 template<typename T>
 std::istream &operator>>(std::istream &istr, Matrix_t<T> &matrix) {
-	for(size_t i = 0; i < matrix.rows_; ++i) {
-		for(size_t j = 0; j < matrix.cols_; ++j) {
+	for(size_t i = 0; i < matrix.getRows(); ++i) {
+		for(size_t j = 0; j < matrix.getCols(); ++j) {
     		istr >> std::ws;
-			istr >> matrix.matrix_[i][j];
+			istr >> matrix.at(i, j);
+            if(!istr.good()) {
+                throw std::invalid_argument("\n Invalid input for matrix elem");
+            }
     	}
 	}
 	return istr;
@@ -368,10 +375,10 @@ std::istream &operator>>(std::istream &istr, Matrix_t<T> &matrix) {
 template<typename T>
 std::ostream &operator<<(std::ostream &ostr, const Matrix_t<T> &matrix) {
     ostr << std::endl;
-    ostr << matrix.rows_ << " " << matrix.cols_ << std::endl;
-    for (size_t i = 0; i < matrix.rows_; ++i) {
-        for (size_t j = 0; j < matrix.cols_; ++j) {
-            ostr << matrix.matrix_[i][j] << " ";
+    ostr << matrix.getRows() << " " << matrix.getCols() << std::endl;
+    for (size_t i = 0; i < matrix.getRows(); ++i) {
+        for (size_t j = 0; j < matrix.getCols(); ++j) {
+            ostr << matrix.at(i, j) << " ";
         }
         ostr << std::endl;
     }
