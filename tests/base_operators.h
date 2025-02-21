@@ -2,7 +2,7 @@
 #define BASE_OPERATORS_H_
 
 #include <gtest/gtest.h>
-#include "../matrix/matrix.h"
+#include "matrix.h"
 
 TEST(Transpose, Subtestv_1) {
     Matrix_t<int> matrix(3);

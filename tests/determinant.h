@@ -4,14 +4,12 @@
 #include <gtest/gtest.h>
 #include <string>
 #include <fstream>
-#include "../matrix/matrix.h"
+#include "path_getter.h"
+#include "matrix.h"
 
 template <typename T>
-void run_test_from_file(size_t file_num) {
-    std::string file_path = std::string(CMAKE_CURRENT_SOURCE_DIR) 
-                          + "/tests/test_files/file" 
-                          + std::to_string(file_num) 
-                          + ".txt";
+void runTestFromFile(size_t file_num) {
+    std::string file_path = testPathGet(file_num);
     std::ifstream test_file;
     test_file.open(file_path);
 
@@ -20,10 +18,7 @@ void run_test_from_file(size_t file_num) {
     Matrix_t<T> matrix(N);
     test_file >> matrix;
 
-    std::string ans_file_path = std::string(CMAKE_CURRENT_SOURCE_DIR) 
-                              + "/tests/test_files/file" 
-                              + std::to_string(file_num) 
-                              + "ans.txt";
+    std::string ans_file_path = testAnsPathGet(file_num);
     std::ifstream test_ans_file;
     test_ans_file.open(ans_file_path);
 
@@ -79,123 +74,123 @@ TEST(Determinant, Subtestv_4) {
 }
 
 TEST(Determinant, Subtestv_5) {
-    run_test_from_file<double>(1);
+    runTestFromFile<double>(1);
 }
 
 TEST(Determinant, Subtestv_6) {
-    run_test_from_file<double>(2);
+    runTestFromFile<double>(2);
 }
 
 TEST(Determinant, Subtestv_7) {
-    run_test_from_file<double>(3);
+    runTestFromFile<double>(3);
 }
 
 TEST(Determinant, Subtestv_8) {
-    run_test_from_file<double>(4);
+    runTestFromFile<double>(4);
 }
 
 TEST(Determinant, Subtestv_9) {
-    run_test_from_file<double>(5);
+    runTestFromFile<double>(5);
 }
 
 TEST(Determinant, Subtestv_10) {
-    run_test_from_file<double>(6);
+    runTestFromFile<double>(6);
 }
 
 TEST(Determinant, Subtestv_11) {
-    run_test_from_file<double>(7);
+    runTestFromFile<double>(7);
 }
 
 TEST(Determinant, Subtestv_12) {
-    run_test_from_file<double>(8);
+    runTestFromFile<double>(8);
 }
 
 TEST(Determinant, Subtestv_13) {
-    run_test_from_file<double>(9);
+    runTestFromFile<double>(9);
 }
 
 TEST(Determinant, Subtestv_14) {
-    run_test_from_file<double>(10);
+    runTestFromFile<double>(10);
 }
 
 TEST(Determinant, Subtestv_15) {
-    run_test_from_file<double>(11);
+    runTestFromFile<double>(11);
 }
 
 TEST(Determinant, Subtestv_16) {
-    run_test_from_file<double>(12);
+    runTestFromFile<double>(12);
 }
 
 TEST(Determinant, Subtestv_17) {
-    run_test_from_file<double>(13);
+    runTestFromFile<double>(13);
 }
 
 TEST(Determinant, Subtestv_18) {
-    run_test_from_file<double>(14);
+    runTestFromFile<double>(14);
 }
 
 TEST(Determinant, Subtestv_19) {
-    run_test_from_file<double>(15);
+    runTestFromFile<double>(15);
 }
 
 TEST(Determinant, Subtestv_20) {
-    run_test_from_file<double>(16);
+    runTestFromFile<double>(16);
 }
 
 TEST(Determinant, Subtestv_21) {
-    run_test_from_file<double>(17);
+    runTestFromFile<double>(17);
 }
 
 TEST(Determinant, Subtestv_22) {
-    run_test_from_file<double>(18);
+    runTestFromFile<double>(18);
 }
 
 TEST(Determinant, Subtestv_23) {
-    run_test_from_file<double>(19);
+    runTestFromFile<double>(19);
 }
 
 TEST(Determinant, Subtestv_24) {
-    run_test_from_file<double>(20);
+    runTestFromFile<double>(20);
 }
 
 TEST(Determinant, Subtestv_25) {
-    run_test_from_file<double>(21);
+    runTestFromFile<double>(21);
 }
 
 TEST(Determinant, Subtestv_26) {
-    run_test_from_file<double>(22);
+    runTestFromFile<double>(22);
 }
 
 TEST(Determinant, Subtestv_27) {
-    run_test_from_file<double>(23);
+    runTestFromFile<double>(23);
 }
 
 TEST(Determinant, Subtestv_28) {
-    run_test_from_file<double>(24);
+    runTestFromFile<double>(24);
 }
 
 TEST(Determinant, Subtestv_29) {
-    run_test_from_file<double>(25);
+    runTestFromFile<double>(25);
 }
 
 TEST(Determinant, Subtestv_30) {
-    run_test_from_file<double>(26);
+    runTestFromFile<double>(26);
 }
 
 TEST(Determinant, Subtestv_31) {
-    run_test_from_file<double>(27);
+    runTestFromFile<double>(27);
 }
 
 TEST(Determinant, Subtestv_32) {
-    run_test_from_file<double>(28);
+    runTestFromFile<double>(28);
 }
 
 TEST(Determinant, Subtestv_33) {
-    run_test_from_file<double>(29);
+    runTestFromFile<double>(29);
 }
 
 TEST(Determinant, Subtestv_34) {
-    run_test_from_file<double>(30);
+    runTestFromFile<double>(30);
 }
 
 #endif // DETERMINANT_H_

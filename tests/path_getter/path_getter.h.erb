@@ -1,0 +1,16 @@
+#ifndef PATH_GETTER_H_
+#define PATH_GETTER_H_
+
+#include <string>
+
+inline std::string testPathGet(size_t test_file_num)
+{
+    return std::string("<%= TESTS_FOLDER %>") + std::string("file") + std::to_string(test_file_num) + std::string(".txt");
+}
+
+inline std::string testAnsPathGet(size_t test_file_num)
+{
+    return std::string("<%= TESTS_FOLDER %>") + std::string("file") + std::to_string(test_file_num) + std::string("ans.txt");
+}
+
+#endif // #define PATH_GETTER_H_

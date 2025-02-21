@@ -5,6 +5,7 @@
 #include <cstring>
 #include <cmath>
 #include <utility>
+#include <algorithm>
 
 #include "exceptions.h"
 
@@ -57,6 +58,7 @@ public:
     Matrix_t<T> inverse()   const;
     Matrix_t<T> transpose() const;
 
+    static void swap(Matrix_t<T>& a, Matrix_t<T>& b) noexcept;
     T **getIdentityMatrix();
 
     T BareissAlgorithm() const;
@@ -88,11 +90,8 @@ Matrix_t<T> &Matrix_t<T>::operator=(const Matrix_t& matrix) {
         return *this;
     }
 
-    rows_   = matrix.getRows();
-    cols_   = matrix.getCols();
-
     Matrix_t<T> tmp(matrix);
-    std::swap(tmp);
+    std::swap(*this, tmp);
     return *this;
 }
 
@@ -142,6 +141,13 @@ T **Matrix_t<T>::allocateMatrix(size_t rows, size_t cols, T **copymatrix) {
     }
 
     return matrix;
+}
+
+template<typename T>
+void Matrix_t<T>::swap(Matrix_t<T>& a, Matrix_t<T>& b) noexcept {
+    std::swap(a.rows_, b.rows_);
+    std::swap(a.cols_, b.cols_);
+    std::swap(a.matrix_, b.matrix_);
 }
 
 template<typename T>
