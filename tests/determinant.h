@@ -2,23 +2,23 @@
 #define DETERMINANT_H_
 
 #include <gtest/gtest.h>
-#include <string>
 #include <fstream>
-#include "path_getter.h"
+#include <string>
 #include "matrix.h"
+#include "path_getter.h"
 
 template <typename T>
 void runTestFromFile(size_t file_num) {
     std::string file_path = testPathGet(file_num);
     std::ifstream test_file;
     test_file.open(file_path);
-    if(!test_file.is_open()) {
+    if (!test_file.is_open()) {
         throw std::runtime_error("\n Failed to open the file: " + file_path);
     }
 
     size_t N;
     test_file >> N;
-    if(!test_file.good()) {
+    if (!test_file.good()) {
         throw std::runtime_error("\n Invalid input for matrix size");
     }
     Matrix_t<T> matrix(N);
@@ -30,7 +30,7 @@ void runTestFromFile(size_t file_num) {
 
     T answer;
     test_ans_file >> answer;
-    if(!test_ans_file.good()) {
+    if (!test_ans_file.good()) {
         throw std::runtime_error("\n Invalid input for answer");
     }
 
@@ -40,12 +40,11 @@ void runTestFromFile(size_t file_num) {
     ASSERT_NEAR(matrix.BareissAlgorithm(), answer, 0.0001f);
 }
 
-
 TEST(Determinant, Subtestv_1) {
     Matrix_t<double> matrix(3);
     std::istringstream input("4 2 3 4 5 6 7 8 9\n");
     input >> matrix;
-    
+
     double answer = -9;
 
     ASSERT_NEAR(matrix.BareissAlgorithm(), answer, 0.0001f);
@@ -55,7 +54,7 @@ TEST(Determinant, Subtestv_2) {
     Matrix_t<double> matrix(3);
     std::istringstream input("4 2 3 4 5 6 7 8 9\n");
     input >> matrix;
-    
+
     double answer = -9;
 
     ASSERT_NEAR(matrix.BareissAlgorithm(), answer, 0.0001f);
@@ -65,7 +64,7 @@ TEST(Determinant, Subtestv_3) {
     Matrix_t<double> matrix(4);
     std::istringstream input("2 4 -1 1 -1 2 1 -1 1 -6 3 -1 2 0 3 -1\n");
     input >> matrix;
-    
+
     double answer = 0;
 
     ASSERT_NEAR(matrix.BareissAlgorithm(), answer, 0.0001f);
@@ -75,7 +74,7 @@ TEST(Determinant, Subtestv_4) {
     Matrix_t<double> matrix(3);
     std::istringstream input("1 5 3 2 4 7 4 6 2\n");
     input >> matrix;
-    
+
     double answer = 74;
 
     ASSERT_NEAR(matrix.BareissAlgorithm(), answer, 0.0001f);
@@ -201,4 +200,4 @@ TEST(Determinant, Subtestv_34) {
     runTestFromFile<double>(30);
 }
 
-#endif // DETERMINANT_H_
+#endif  // DETERMINANT_H_
