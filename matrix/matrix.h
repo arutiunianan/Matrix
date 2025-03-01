@@ -31,8 +31,8 @@ public:
     explicit Matrix_t(size_t rows);
     Matrix_t(const Matrix_t &matrix);
     Matrix_t &operator=(const Matrix_t &matrix);
-    Matrix_t(Matrix_t &&matrix);
-    Matrix_t &operator=(Matrix_t &&matrix);
+    Matrix_t(Matrix_t &&matrix) noexcept;
+    Matrix_t &operator=(Matrix_t &&matrix) noexcept;
     ~Matrix_t();
 
     size_t getRows() const noexcept {
@@ -86,24 +86,26 @@ Matrix_t<T>::Matrix_t(const Matrix_t &matrix):
 
 template<typename T>
 Matrix_t<T> &Matrix_t<T>::operator=(const Matrix_t& matrix) {
-    if (this == &matrix) {
+    if(this == &matrix) {
         return *this;
     }
 
     Matrix_t<T> tmp(matrix);
-    std::swap(*this, tmp);
+    swap(*this, tmp);
     return *this;
 }
 
 template<typename T>
-Matrix_t<T>::Matrix_t(Matrix_t &&matrix):
-    rows_(std::exchange(matrix.rows_, 0)),
-    cols_(std::exchange(matrix.cols_, 0)),
-    matrix_(std::exchange(matrix.matrix_, nullptr)) {}
+Matrix_t<T>::Matrix_t(Matrix_t &&matrix) noexcept:
+    rows_(0),
+    cols_(0),
+    matrix_(nullptr) {
+    swap(*this, matrix);
+}
 
 template<typename T>
-Matrix_t<T> &Matrix_t<T>::operator=(Matrix_t &&matrix) {
-    if (this == &matrix) {
+Matrix_t<T> &Matrix_t<T>::operator=(Matrix_t &&matrix) noexcept {
+    if(this == &matrix) {
         return *this;
     }
 
@@ -115,7 +117,7 @@ Matrix_t<T> &Matrix_t<T>::operator=(Matrix_t &&matrix) {
 
 template<typename T>
 Matrix_t<T>::~Matrix_t() {
-    for (size_t i = 0; i < rows_; ++i) {
+    for(size_t i = 0; i < rows_; ++i) {
         delete[] matrix_[i];
     }
     delete[] matrix_;
@@ -343,7 +345,7 @@ Matrix_t<T> Matrix_t<T>::inverse() const {
         }
     }
 
-    for (size_t i = 0; i < rows_; ++i) {
+    for(size_t i = 0; i < rows_; ++i) {
         delete[] bufmatrix_[i];
     }
     delete[] bufmatrix_;
@@ -382,8 +384,8 @@ template<typename T>
 std::ostream &operator<<(std::ostream &ostr, const Matrix_t<T> &matrix) {
     ostr << std::endl;
     ostr << matrix.getRows() << " " << matrix.getCols() << std::endl;
-    for (size_t i = 0; i < matrix.getRows(); ++i) {
-        for (size_t j = 0; j < matrix.getCols(); ++j) {
+    for(size_t i = 0; i < matrix.getRows(); ++i) {
+        for(size_t j = 0; j < matrix.getCols(); ++j) {
             ostr << matrix.at(i, j) << " ";
         }
         ostr << std::endl;

@@ -12,9 +12,15 @@ void runCopyConstructor(size_t file_num) {
     std::string file_path = testPathGet(file_num);
     std::ifstream test_file;
     test_file.open(file_path);
+    if(!test_file.is_open()) {
+        throw std::runtime_error("\n Failed to open the file: " + file_path);
+    }
 
     size_t N;
     test_file >> N;
+    if(!test_file.good()) {
+        throw std::runtime_error("\n Invalid input for matrix size");
+    }
     Matrix_t<T> matrix(N);
     test_file >> matrix;
 
@@ -24,6 +30,9 @@ void runCopyConstructor(size_t file_num) {
 
     size_t ans_N;
     test_file >> ans_N;
+    if(!test_file.good()) {
+        throw std::runtime_error("\n Invalid input for matrix size");
+    }
     Matrix_t<T> ans_matrix(ans_N);
     test_file >> ans_matrix;
 
@@ -99,9 +108,15 @@ void runCopyAssignment(size_t file_num) {
     std::string file_path = testPathGet(file_num);
     std::ifstream test_file;
     test_file.open(file_path);
+    if(!test_file.is_open()) {
+        throw std::runtime_error("\n Failed to open the file: " + file_path);
+    }
 
     size_t N;
     test_file >> N;
+    if(!test_file.good()) {
+        throw std::runtime_error("\n Invalid input for matrix size");
+    }
     Matrix_t<T> matrix(N);
     test_file >> matrix;
 
@@ -112,6 +127,9 @@ void runCopyAssignment(size_t file_num) {
 
     size_t ans_N;
     test_file >> ans_N;
+    if(!test_file.good()) {
+        throw std::runtime_error("\n Invalid input for matrix size");
+    }
     Matrix_t<T> ans_matrix(ans_N);
     test_file >> ans_matrix;
 
@@ -187,9 +205,15 @@ void runMoveConstructor(size_t file_num) {
     std::string file_path = testPathGet(file_num);
     std::ifstream test_file;
     test_file.open(file_path);
+    if(!test_file.is_open()) {
+        throw std::runtime_error("\n Failed to open the file: " + file_path);
+    }
 
     size_t N;
     test_file >> N;
+    if(!test_file.good()) {
+        throw std::runtime_error("\n Invalid input for matrix size");
+    }
     Matrix_t<T> matrix(N);
     test_file >> matrix;
 
@@ -200,6 +224,9 @@ void runMoveConstructor(size_t file_num) {
 
     size_t ans_N;
     test_file >> ans_N;
+    if(!test_file.good()) {
+        throw std::runtime_error("\n Invalid input for matrix size");
+    }
     Matrix_t<T> ans_matrix(ans_N);
     test_file >> ans_matrix;
 
@@ -275,9 +302,15 @@ void runMoveAssignment(size_t file_num) {
     std::string file_path = testPathGet(file_num);
     std::ifstream test_file;
     test_file.open(file_path);
+    if(!test_file.is_open()) {
+        throw std::runtime_error("\n Failed to open the file: " + file_path);
+    }
 
     size_t N;
     test_file >> N;
+    if(!test_file.good()) {
+        throw std::runtime_error("\n Invalid input for matrix size");
+    }
     Matrix_t<T> matrix(N);
     test_file >> matrix;
 
@@ -288,6 +321,9 @@ void runMoveAssignment(size_t file_num) {
 
     size_t ans_N;
     test_file >> ans_N;
+    if(!test_file.good()) {
+        throw std::runtime_error("\n Invalid input for matrix size");
+    }
     Matrix_t<T> ans_matrix(ans_N);
     test_file >> ans_matrix;
 

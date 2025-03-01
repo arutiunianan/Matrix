@@ -12,9 +12,15 @@ void runTestFromFile(size_t file_num) {
     std::string file_path = testPathGet(file_num);
     std::ifstream test_file;
     test_file.open(file_path);
+    if(!test_file.is_open()) {
+        throw std::runtime_error("\n Failed to open the file: " + file_path);
+    }
 
     size_t N;
     test_file >> N;
+    if(!test_file.good()) {
+        throw std::runtime_error("\n Invalid input for matrix size");
+    }
     Matrix_t<T> matrix(N);
     test_file >> matrix;
 
@@ -24,7 +30,9 @@ void runTestFromFile(size_t file_num) {
 
     T answer;
     test_ans_file >> answer;
-
+    if(!test_ans_file.good()) {
+        throw std::runtime_error("\n Invalid input for answer");
+    }
 
     test_file.close();
     test_ans_file.close();
