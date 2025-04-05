@@ -100,9 +100,7 @@ Matrix_t<T>& Matrix_t<T>::operator=(Matrix_t&& matrix) noexcept {
         return *this;
     }
 
-    rows_ = std::exchange(matrix.rows_, rows_);
-    cols_ = std::exchange(matrix.cols_, cols_);
-    matrix_ = std::exchange(matrix.matrix_, matrix_);
+    swap(*this, matrix);
     return *this;
 }
 

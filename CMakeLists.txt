@@ -33,4 +33,10 @@ target_include_directories(testex PRIVATE ${GTEST_INCLUDE_DIRS}
                                           ${CMAKE_BINARY_DIR}/include)
 target_link_libraries(testex GTest::GTest GTest::Main)
 
-add_test(NAME mytest COMMAND testex)
+add_test(NAME gtest_test COMMAND testex)
+
+add_test(NAME end2end_test
+    COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tests/test.sh
+            ${CMAKE_CURRENT_SOURCE_DIR}
+            $<TARGET_FILE:matrix> 30
+)

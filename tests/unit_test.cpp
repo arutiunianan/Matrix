@@ -1,6 +1,5 @@
 #include "base_operators.h"
 #include "constructors.h"
-#include "determinant.h"
 
 int main(int argc, char** argv) {
     ::testing::InitGoogleTest(&argc, argv);
