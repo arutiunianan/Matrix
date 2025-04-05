@@ -6,7 +6,7 @@ blue="\033[1;36m"
 white="\033[1;37m"
 usual="\033[0m"
 
-TESTS_DIR=$1/tests/test_files
+TESTS_DIR=$1/test_files
 MATRIX_BIN=$2
 TESTS_NUM=$3
 
