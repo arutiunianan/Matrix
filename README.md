@@ -2,8 +2,6 @@
 
 <image src="for_readme/thematrix.png" width=500px>
 
-upb<sub>после завершения проекта и определения ментора поля постера заполнятся:)</sub>
-
 ## What does it do?
 
 You can use this project to work with matrices, perform basic operations on them, and most importantly, for calculating the determinant.
